@@ -9,17 +9,17 @@ public class PlayerController : MonoBehaviour
 
     void Start()
     {
-    controller = GetComponent<CharacterController>();
+        controller = GetComponent<CharacterController>();
     }
     void Update()
     {
-    Vector3 direction = new Vector3(moveInput.x, 0f, moveInput.y);
-    direction = Vector3.ClampMagnitude(direction, 1f);
-    controller.Move(direction * Time.deltaTime * moveSpeed);
+        Vector3 direction = new Vector3(moveInput.x, 0f, moveInput.y);
+        direction = Vector3.ClampMagnitude(direction, 1f);
+        controller.Move(direction * Time.deltaTime * moveSpeed);
     }
 
     void OnMove(InputValue value)
     {
-    moveInput = value.Get<Vector2>();
+        moveInput = value.Get<Vector2>();
     }
 }
