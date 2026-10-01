@@ -104,3 +104,10 @@ InitTestScene*.unity*
 
 # Auto-generated cache in Assets folder
 /[Aa]ssets/[Ss]ceneDependencyCache*
+.plastic/cachedtrees/56e62dd7-241f-41e9-8c6b-dd4ca4513e62.1
+.plastic/cachedtrees/mounttimestamp.dat
+.plastic/plastic.changes
+.plastic/plastic.fullycheckeddirectories
+.plastic/plastic.selector
+.plastic/plastic.wktree
+.plastic/plastic.workspace
