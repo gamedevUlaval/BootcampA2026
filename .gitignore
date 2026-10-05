@@ -37,6 +37,12 @@
 # Visual Studio cache directory
 .vs/
 
+# VS Code personal settings
+.vscode/
+
+# Per-user scene template preference
+ProjectSettings/SceneTemplateSettings.json
+
 # Gradle cache directory
 .gradle/
 
