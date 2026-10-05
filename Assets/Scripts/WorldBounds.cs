@@ -2,87 +2,133 @@ using UnityEngine;
 
 public class WorldBounds : MonoBehaviour
 {
-    public float boundsPadding = 0f;
-    public float wallHeight = 5f;
-    public float wallThickness = 1f;
-    public Camera gameCamera;
+    [Header("Global Scale")]
+    [Tooltip("Multiplies all 4 arena distances at once.")]
+    [Range(0.25f, 4f)] public float uniformScale = 1f;
+
+    [Header("Arena Limits")]
+    [Min(0f)] public float distanceToLeftWall = 5.33f;
+
+    [Min(0f)] public float distanceToRightWall = 5.33f;
+
+    [Min(0f)] public float distanceToBottomWall = 4.4815f;
+
+    [Min(0f)] public float distanceToTopWall = 4.4815f;
+
+    [Header("Center Divider")]
+    public bool enableCenterDivider = true;
+
+    [Tooltip("0 = exactly in the middle, positive = shifted toward the right of the screen.")]
+    public float centerDividerOffset = 0f;
+
+    [Min(0.05f)] public float centerDividerThickness = 0.5f;
+
+    [Header("Walls")]
+    [Min(0f)] public float wallHeight = 5f;
+
+    [Min(0f)] public float wallThickness = 1f;
+
+    float LeftDistance
+    {
+        get { return distanceToLeftWall * uniformScale; }
+    }
+
+    float RightDistance
+    {
+        get { return distanceToRightWall * uniformScale; }
+    }
+
+    float BottomDistance
+    {
+        get { return distanceToBottomWall * uniformScale; }
+    }
+
+    float TopDistance
+    {
+        get { return distanceToTopWall * uniformScale; }
+    }
+
+    float LeftEdge
+    {
+        get { return transform.position.x - LeftDistance; }
+    }
+
+    float RightEdge
+    {
+        get { return transform.position.x + RightDistance; }
+    }
+
+    float BottomEdge
+    {
+        get { return transform.position.z - BottomDistance; }
+    }
+
+    Vector3 ArenaCenter
+    {
+        get
+        {
+            float midWidth = (RightDistance - LeftDistance) / 2f;
+            float midDepth = (TopDistance - BottomDistance) / 2f;
+            return transform.position + new Vector3(midWidth, 0f, midDepth);
+        }
+    }
+
+    float ArenaWidth
+    {
+        get { return LeftDistance + RightDistance; }
+    }
+
+    float ArenaDepth
+    {
+        get { return BottomDistance + TopDistance; }
+    }
+
+    float SplitX
+    {
+        get { return ArenaCenter.x + (enableCenterDivider ? centerDividerOffset : 0f); }
+    }
+
     void Start()
     {
-        Rect visibleArea = CalculateVisibleGroundArea();
-        
-        float worldWidth = visibleArea.width + (boundsPadding * 2f);
-        float worldDepth = visibleArea.height + (boundsPadding * 2f);
-
-        float centerX = visibleArea.x + (visibleArea.width / 2f);
-        float centerZ = visibleArea.y + (visibleArea.height / 2f);
-
-        float halfWidth = worldWidth / 2f;
-        float halfDepth = worldDepth / 2f;
-
-        CreateWall(new Vector3(centerX, wallHeight / 2f, centerZ + halfDepth), 
-        new Vector3(worldWidth, wallHeight, wallThickness));
-
-        CreateWall(new Vector3(centerX, wallHeight / 2f, centerZ - halfDepth), 
-        new Vector3(worldWidth, wallHeight, wallThickness));
-
-        CreateWall(new Vector3(centerX + halfWidth, wallHeight / 2f, centerZ), 
-        new Vector3(wallThickness, wallHeight, worldDepth));
-
-        CreateWall(new Vector3(centerX - halfWidth, wallHeight / 2f, centerZ), 
-        new Vector3(wallThickness, wallHeight, worldDepth));
-
-        Debug.Log("Camera position: " + gameCamera.transform.position);
-        Debug.Log("Camera rotation: " + gameCamera.transform.rotation.eulerAngles);
-        Debug.Log("Visible area: " + visibleArea);
-        Debug.Log("World position of this WorldBounds object: " + transform.position);
-
-    }
-    Rect CalculateVisibleGroundArea()
-    {
-        Vector3 bottomLeft = RaycastToGround(0f, 0f);
-        Vector3 bottomRight = RaycastToGround(1f, 0f);
-        Vector3 topLeft = RaycastToGround(0f, 1f);
-        Vector3 topRight = RaycastToGround(1f, 1f);
-        
-        float minX = Mathf.Min(bottomLeft.x, bottomRight.x, topLeft.x, topRight.x);
-        float maxX = Mathf.Max(bottomLeft.x, bottomRight.x, topLeft.x, topRight.x);
-        float minZ = Mathf.Min(bottomLeft.z, bottomRight.z, topLeft.z, topRight.z);
-        float maxZ = Mathf.Max(bottomLeft.z, bottomRight.z, topLeft.z, topRight.z);
-        
-        return new Rect(minX, minZ, maxX - minX, maxZ - minZ);
+        BuildWalls();
     }
 
-    Vector3 RaycastToGround(float viewportX, float viewportY)
+    void BuildWalls()
     {
-        Ray ray = gameCamera.ViewportPointToRay(new Vector3(viewportX, viewportY, 0));
-        Plane groundPlane = new Plane(Vector3.up, Vector3.zero);
-        groundPlane.Raycast(ray, out float distance);
-        return ray.GetPoint(distance);
+        Vector3 origin = transform.position;
+        Vector3 center = ArenaCenter;
+
+        CreateWall("Wall", new Vector3(origin.x - LeftDistance, wallHeight / 2f, center.z),
+                   new Vector3(wallThickness, wallHeight, ArenaDepth));
+
+        CreateWall("Wall", new Vector3(origin.x + RightDistance, wallHeight / 2f, center.z),
+                   new Vector3(wallThickness, wallHeight, ArenaDepth));
+
+        CreateWall("Wall", new Vector3(center.x, wallHeight / 2f, origin.z - BottomDistance),
+                   new Vector3(ArenaWidth, wallHeight, wallThickness));
+
+        CreateWall("Wall", new Vector3(center.x, wallHeight / 2f, origin.z + TopDistance),
+                   new Vector3(ArenaWidth, wallHeight, wallThickness));
+
+        if (enableCenterDivider)
+        {
+            CreateWall("CenterDivider", new Vector3(SplitX, wallHeight / 2f, center.z),
+                       new Vector3(centerDividerThickness, wallHeight, ArenaDepth));
+        }
     }
 
-    void CreateWall(Vector3 position, Vector3 size)
+    void CreateWall(string wallName, Vector3 position, Vector3 size)
     {
-        GameObject wall = new GameObject("Wall");
+        GameObject wall = new GameObject(wallName);
         wall.transform.position = position;
         wall.transform.parent = transform;
-        
-        BoxCollider collider = wall.AddComponent<BoxCollider>();
-        collider.size = size;
+        wall.AddComponent<BoxCollider>().size = size;
     }
 
     public Rect GetSpawnArea(int playerIndex)
     {
-        Rect visibleArea = CalculateVisibleGroundArea();
-        float halfWidth = visibleArea.width / 2f;
-
-        if (playerIndex == 0)
-        {
-            return new Rect(visibleArea.x, visibleArea.y, halfWidth, visibleArea.height);
-        }
-        else
-        {
-            return new Rect(visibleArea.x + halfWidth, visibleArea.y, halfWidth, visibleArea.height);
-        }
+        return playerIndex == 0
+            ? new Rect(LeftEdge, BottomEdge, SplitX - LeftEdge, ArenaDepth)
+            : new Rect(SplitX, BottomEdge, RightEdge - SplitX, ArenaDepth);
     }
-
 }
