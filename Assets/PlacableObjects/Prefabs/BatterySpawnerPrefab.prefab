@@ -15,7 +15,7 @@ GameObject:
   - component: {fileID: 4219728935692883683}
   - component: {fileID: 6864063923235239523}
   m_Layer: 0
-  m_Name: FoodSpawner
+  m_Name: BatterySpawnerPrefab
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -126,7 +126,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f8f728efcdb7a3b47a7d3b1bbc6cb4fd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Placable
-  data: {fileID: 11400000, guid: bb1920f05a4697946a4d88a43074a992, type: 2}
+  data: {fileID: 11400000, guid: 67fec219e2f603849a0b16e2bc7a8e30, type: 2}
 --- !u!114 &6864063923235239523
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -139,6 +139,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8cc7f9ded180e624bb48299e5dda3cf4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::RessourceSpawner
-  resource: {fileID: 11400000, guid: d15ac29a67b8b294a970d6ce3b159678, type: 2}
+  resource: {fileID: 11400000, guid: 4bee59c234d110149b58f47a056ccde7, type: 2}
   spawnInterval: 1
   spawnRadius: 15

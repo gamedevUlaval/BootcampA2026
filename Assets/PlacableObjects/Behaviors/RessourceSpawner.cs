@@ -1,5 +1,6 @@
 using UnityEngine;
 
+[RequireComponent(typeof(Placable))]
 public class RessourceSpawner : MonoBehaviour
 {
     public ResourceScriptableObject resource;

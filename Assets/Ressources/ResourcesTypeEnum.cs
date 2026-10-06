@@ -2,5 +2,7 @@ using UnityEngine;
 
 public enum ResourcesType
 {
-    Food
+    Food,
+    Battery,
+    Stone
 }

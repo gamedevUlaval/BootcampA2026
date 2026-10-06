@@ -1,18 +1,18 @@
+using UnityEditor;
+#if UNITY_EDITOR
 using UnityEngine;
+#endif
 
 public class Placable : MonoBehaviour
 {
     public PlacableObjectData data;
 
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
+#if UNITY_EDITOR
+    private void OnDrawGizmos()
     {
-        
-    }
+        Vector3 textPosition = transform.position + Vector3.up * 1.5f;
 
-    // Update is called once per frame
-    void Update()
-    {
-        
+        Handles.Label(textPosition, gameObject.name);
     }
+#endif
 }
