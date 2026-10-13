@@ -12,8 +12,9 @@ GameObject:
   - component: {fileID: 2161930036091152290}
   - component: {fileID: 6037902270596931389}
   - component: {fileID: 6940047322556511002}
+  - component: {fileID: 6251439822699426983}
   m_Layer: 0
-  m_Name: FoodPrefab
+  m_Name: StonePrefab
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -106,9 +107,22 @@ SphereCollider:
     serializedVersion: 2
     m_Bits: 0
   m_LayerOverridePriority: 0
-  m_IsTrigger: 0
+  m_IsTrigger: 1
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
   m_Radius: 0.5
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!114 &6251439822699426983
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7140255346245424885}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0f1d6c1189d13bd4896bbdce54ce0f89, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ResourceComponent
+  resourceScriptableObject: {fileID: 11400000, guid: 6a901f2f66676d442a964ef672c895dc, type: 2}

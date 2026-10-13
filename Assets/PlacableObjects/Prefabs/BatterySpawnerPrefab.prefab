@@ -141,4 +141,4 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::RessourceSpawner
   resource: {fileID: 11400000, guid: 4bee59c234d110149b58f47a056ccde7, type: 2}
   spawnInterval: 1
-  spawnRadius: 15
+  spawnRadius: 2
