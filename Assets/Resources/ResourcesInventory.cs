@@ -6,13 +6,6 @@ using static UnityEngine.EventSystems.EventTrigger;
 
 public class ResourcesInventory : MonoBehaviour
 {
-    [Serializable]
-    public class ResourceEntry
-    {
-        public ResourcesType resourceType;
-        public int value;
-    }
-
     public List<ResourceEntry> inventory;
 
     public bool AddResource(ResourcesType resourceType, int value)
