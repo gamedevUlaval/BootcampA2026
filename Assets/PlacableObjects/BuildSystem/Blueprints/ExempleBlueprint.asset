@@ -12,6 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 74571ff0cdefa05408bc1e600010ba8b, type: 3}
   m_Name: ExempleBlueprint
   m_EditorClassIdentifier: Assembly-CSharp::BuildableBlueprintScriptableObject
+  displayName: Exemple
   recipe:
   - resourceType: 0
     value: 2

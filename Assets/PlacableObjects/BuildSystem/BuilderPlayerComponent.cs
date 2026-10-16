@@ -22,6 +22,8 @@ public class BuilderPlayerComponent : MonoBehaviour
     {
         playerController = GetComponent<PlayerController>();
 
+        inventory = GetComponent<ResourcesInventory>();
+
         menu = FindFirstObjectByType<BuildMenuUI>();
         if (menu != null) menu.SetBuilder(this);
     }
