@@ -1,17 +1,17 @@
 using UnityEngine;
 
-public class DefendPositionState : State
+public class IdleState : State
 {
-    private Vector3 defendingPosition;
+    private Vector3 idleLocation;
 
     public void SetPosition(Vector3 position)
     {
-        defendingPosition = position;
+        idleLocation = position;
     }
 
     public override void OnEnter()
     {
-        defendingPosition = transform.position;
+        idleLocation = transform.position;
     }
 
     public override void OnExit(){}

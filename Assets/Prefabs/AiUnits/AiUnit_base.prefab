@@ -10,8 +10,8 @@ GameObject:
   m_Component:
   - component: {fileID: 4554901657245202722}
   - component: {fileID: 4981834797548205958}
-  - component: {fileID: 8081282894283961846}
   - component: {fileID: 680088795576943257}
+  - component: {fileID: 8112054833947742904}
   m_Layer: 0
   m_Name: States
   m_TagString: Untagged
@@ -46,18 +46,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f9334c97ff49a0c46a6476edc47536d7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::FollowState
---- !u!114 &8081282894283961846
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3384782463856346638}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c4c8197c6a64ebe4f90ba817a734025a, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::DefendPositionState
 --- !u!114 &680088795576943257
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -70,6 +58,19 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1721966936c22224095d56c87d54e0f7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CombatState
+  AiUnitDetector: {fileID: 0}
+--- !u!114 &8112054833947742904
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3384782463856346638}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b39829738b94ae349ad3461698f24e62, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::IdleState
 --- !u!1 &7630474076791135440
 GameObject:
   m_ObjectHideFlags: 0
@@ -120,6 +121,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::AiUnit
   stats: {fileID: 0}
+  type: 0
   Agent: {fileID: 0}
 --- !u!195 &1366631759676180819
 NavMeshAgent:
