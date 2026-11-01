@@ -10,6 +10,7 @@ public class BuilderPlayerComponent : MonoBehaviour
 
     [Tooltip("Distance in front of the player where the building spawn")]
     [SerializeField] private float buildDistance = 2f;
+    [SerializeField] private float groundOffset = 0.5f;
 
     private PlayerController playerController;
     private BuildMenuUI menu;
@@ -26,6 +27,9 @@ public class BuilderPlayerComponent : MonoBehaviour
 
         menu = FindFirstObjectByType<BuildMenuUI>();
         if (menu != null) menu.SetBuilder(this);
+
+        ResourcesHUD hud = FindFirstObjectByType<ResourcesHUD>();
+        if (hud != null) hud.SetInventory(inventory);
     }
 
     private void OnBuildMenu(InputValue value)
@@ -112,11 +116,14 @@ public class BuilderPlayerComponent : MonoBehaviour
                 remaining -= taken;
             }
         }
+
+        inventory.NotifyChanged();
     }
 
     private void GetSpawnPose(out Vector3 position, out Quaternion rotation)
     {
         position = transform.position + transform.forward * buildDistance;
-        rotation = Quaternion.Euler(0f, transform.eulerAngles.y, 0f);
+        position.y += groundOffset;
+        rotation = Quaternion.Euler(0f, 0f, 0f);
     }
 }

@@ -176,9 +176,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ResourcesInventory
   inventory:
   - resourceType: 0
-    value: 0
+    value: 10
   - resourceType: 1
-    value: 0
+    value: 20
 --- !u!114 &4499362464318758252
 MonoBehaviour:
   m_ObjectHideFlags: 0

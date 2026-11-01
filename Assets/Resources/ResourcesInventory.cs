@@ -8,6 +8,8 @@ public class ResourcesInventory : MonoBehaviour
 {
     public List<ResourceEntry> inventory;
 
+    public event Action OnChanged;
+
     public bool AddResource(ResourcesType resourceType, int value)
     {
         ResourceEntry resourceEntryToModify = inventory.Find(x => x.resourceType == resourceType);
@@ -15,6 +17,7 @@ public class ResourcesInventory : MonoBehaviour
         if (resourceEntryToModify != null)
         {
             resourceEntryToModify.value += value;
+            OnChanged?.Invoke();
             return true;
         }
         else
@@ -22,5 +25,10 @@ public class ResourcesInventory : MonoBehaviour
             Debug.Log("Cannot pickup because resource type not found in inventory.");
             return false;
         }
+    }
+
+    public void NotifyChanged()
+    {
+        OnChanged?.Invoke();
     }
 }

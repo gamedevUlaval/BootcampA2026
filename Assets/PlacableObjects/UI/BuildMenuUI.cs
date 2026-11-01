@@ -158,7 +158,6 @@ public class BuildMenuUI : MonoBehaviour
     {
         StringBuilder sb = new StringBuilder();
         sb.Append(blueprint.name);
-        sb.Append(buildable ? "  [Available]" : "  [Missing resources]");
         sb.Append("\n<size=70%>");
 
         bool first = true;

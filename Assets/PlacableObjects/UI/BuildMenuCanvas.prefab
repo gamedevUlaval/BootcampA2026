@@ -119,7 +119,7 @@ MonoBehaviour:
   listContainer: {fileID: 8779291096561408140}
   rowPrefab: {fileID: 7357412484657271253, guid: 38a28a4d451d4884fa6575d4ed54cbb6, type: 3}
   feedbackText: {fileID: 4493574726708555567}
-  buildableColor: {r: 0.4, g: 1, b: 0.4, a: 1}
+  buildableColor: {r: 0.07375703, g: 0.7830189, b: 0, a: 1}
   notBuildableColor: {r: 1, g: 0.4, b: 0.4, a: 1}
   screenOffset: {x: -2, y: 1}
   towardCamera: 5
