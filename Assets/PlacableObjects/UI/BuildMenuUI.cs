@@ -13,7 +13,6 @@ public class BuildMenuUI : MonoBehaviour
     [SerializeField] private GameObject panel;
     [SerializeField] private RectTransform listContainer;
     [SerializeField] private Button rowPrefab;
-    [SerializeField] private TMP_Text feedbackText;
 
     [Header("Look")]
     [SerializeField] private Color buildableColor = new Color(0.4f, 1f, 0.4f);
@@ -79,7 +78,6 @@ public class BuildMenuUI : MonoBehaviour
     {
         BuildRows();
         panel.SetActive(true);
-        SetFeedback(string.Empty);
 
         if (rows.Count > 0 && eventSystem != null)
         {
@@ -180,18 +178,11 @@ public class BuildMenuUI : MonoBehaviour
 
     private void OnRowClicked(BuildableBlueprintScriptableObject blueprint)
     {
-        SetFeedback(builder.TryBuild(blueprint)
-            ? $"Built {blueprint.name}"
-            : $"Not enough resources for {blueprint.name}");
+        builder.TryBuild(blueprint);
     }
 
     private void HandleBuilt(BuildableBlueprintScriptableObject blueprint)
     {
         if (IsOpen) RefreshRows();
-    }
-
-    private void SetFeedback(string message)
-    {
-        if (feedbackText != null) feedbackText.text = message;
     }
 }

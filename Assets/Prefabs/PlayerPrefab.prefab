@@ -359,6 +359,10 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 1389988869824842180}
     - target: {fileID: 4266018304853247622, guid: 9a71ca9a79e11de4dbb5ba5558c0c5c8, type: 3}
+      propertyPath: feedbackText
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 4266018304853247622, guid: 9a71ca9a79e11de4dbb5ba5558c0c5c8, type: 3}
       propertyPath: towardCamera
       value: 7
       objectReference: {fileID: 0}
@@ -383,7 +387,8 @@ PrefabInstance:
       value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
-    m_RemovedGameObjects: []
+    m_RemovedGameObjects:
+    - {fileID: 1497034965463383538, guid: 9a71ca9a79e11de4dbb5ba5558c0c5c8, type: 3}
     m_AddedGameObjects: []
     m_AddedComponents:
     - targetCorrespondingSourceObject: {fileID: 1235760013471908980, guid: 9a71ca9a79e11de4dbb5ba5558c0c5c8, type: 3}
