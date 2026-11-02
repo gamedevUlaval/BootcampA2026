@@ -4,9 +4,18 @@ using UnityEngine;
 
 public class ResourcesHUD : MonoBehaviour
 {
+    [SerializeField] private int playerIndex = 0;
     [SerializeField] private TMP_Text label;
 
+    public int PlayerIndex => playerIndex;
+
     private ResourcesInventory inventory;
+
+    private void Awake()
+    {
+        if (label == null) label = GetComponent<TMP_Text>();
+        Refresh();
+    }
 
     public void SetInventory(ResourcesInventory newInventory)
     {
@@ -35,6 +44,7 @@ public class ResourcesHUD : MonoBehaviour
         }
 
         StringBuilder sb = new StringBuilder();
+        sb.Append("P").Append(playerIndex + 1).AppendLine();
         foreach (ResourceEntry entry in inventory.inventory)
         {
             sb.Append(entry.resourceType).Append(": ").Append(entry.value).AppendLine();

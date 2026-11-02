@@ -4,32 +4,52 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 
 [RequireComponent(typeof(ResourcesInventory))]
+[RequireComponent(typeof(PlayerInput))]
 public class BuilderPlayerComponent : MonoBehaviour
 {
-    public List<BuildableBlueprintScriptableObject> availableBlueprints = new List<BuildableBlueprintScriptableObject>();
+    [SerializeField] private List<BuildableBlueprintScriptableObject> availableBlueprints = new List<BuildableBlueprintScriptableObject>();
 
-    [Tooltip("Distance in front of the player where the building spawn")]
-    [SerializeField] private float buildDistance = 2f;
+    [Tooltip("Where the building appears. If empty, it spawns in front of the player.")]
+    [SerializeField] private Transform buildPoint;
+    [SerializeField] private float fallbackBuildDistance = 2f;
     [SerializeField] private float groundOffset = 0.5f;
-
-    private PlayerController playerController;
-    private BuildMenuUI menu;
 
     public event Action<BuildableBlueprintScriptableObject> OnBuilt;
 
+    public IReadOnlyList<BuildableBlueprintScriptableObject> AvailableBlueprints => availableBlueprints;
+    public int PlayerIndex => playerInput != null ? playerInput.playerIndex : 0;
+
     private ResourcesInventory inventory;
+    private PlayerInput playerInput;
+    private PlayerController playerController;
+    private BuildMenuUI menu;
+    private ResourcesHUD hud;
 
-    public void Start()
+    private void Awake()
     {
-        playerController = GetComponent<PlayerController>();
-
         inventory = GetComponent<ResourcesInventory>();
+        playerInput = GetComponent<PlayerInput>();
+        playerController = GetComponent<PlayerController>();
+        menu = GetComponentInChildren<BuildMenuUI>(true);
+    }
 
-        menu = FindFirstObjectByType<BuildMenuUI>();
-        if (menu != null) menu.SetBuilder(this);
+    private void Start()
+    {
+        foreach (ResourcesHUD candidate in FindObjectsByType<ResourcesHUD>(FindObjectsSortMode.None))
+        {
+            if (candidate.PlayerIndex == PlayerIndex)
+            {
+                hud = candidate;
+                hud.SetInventory(inventory);
+                break;
+            }
+        }
+    }
 
-        ResourcesHUD hud = FindFirstObjectByType<ResourcesHUD>();
-        if (hud != null) hud.SetInventory(inventory);
+    private void OnDestroy()
+    {
+        if (hud != null) hud.SetInventory(null);
+        if (menu != null) Destroy(menu.gameObject);
     }
 
     private void OnBuildMenu(InputValue value)
@@ -43,26 +63,13 @@ public class BuilderPlayerComponent : MonoBehaviour
 
     public bool TryBuild(BuildableBlueprintScriptableObject blueprint)
     {
-        if (inventory == null)
-        {
-            Debug.LogError("Could not build because the player misses the ResourcesInventory component", this);
-            return false;
-        }
-
-        if (blueprint == null || blueprint.prefab == null)
-        {
-            Debug.LogWarning("Could not build: blueprint or its prefab is null", this);
-            return false;
-        }
-
-        if (!IsBuildable(blueprint))
-        {
-            return false;
-        }
+        if (blueprint == null || blueprint.prefab == null) return false;
+        if (!IsBuildable(blueprint)) return false;
 
         ConsumeResources(blueprint);
 
         GetSpawnPose(out Vector3 position, out Quaternion rotation);
+        position.y += groundOffset;
         Instantiate(blueprint.prefab, position, rotation);
 
         OnBuilt?.Invoke(blueprint);
@@ -71,26 +78,17 @@ public class BuilderPlayerComponent : MonoBehaviour
 
     public bool IsBuildable(BuildableBlueprintScriptableObject blueprint)
     {
-        if (inventory == null || blueprint == null)
-        {
-            return false;
-        }
+        if (inventory == null || blueprint == null) return false;
 
         foreach (ResourceEntry cost in blueprint.recipe)
         {
             int owned = 0;
             foreach (ResourceEntry entry in inventory.inventory)
             {
-                if (entry.resourceType == cost.resourceType)
-                {
-                    owned += entry.value;
-                }
+                if (entry.resourceType == cost.resourceType) owned += entry.value;
             }
 
-            if (owned < cost.value)
-            {
-                return false;
-            }
+            if (owned < cost.value) return false;
         }
 
         return true;
@@ -105,14 +103,10 @@ public class BuilderPlayerComponent : MonoBehaviour
             for (int i = 0; i < inventory.inventory.Count && remaining > 0; i++)
             {
                 ResourceEntry entry = inventory.inventory[i];
-                if (entry.resourceType != cost.resourceType)
-                {
-                    continue;
-                }
+                if (entry.resourceType != cost.resourceType) continue;
 
                 int taken = Mathf.Min(entry.value, remaining);
                 entry.value -= taken;
-                inventory.inventory[i] = entry;
                 remaining -= taken;
             }
         }
@@ -122,8 +116,15 @@ public class BuilderPlayerComponent : MonoBehaviour
 
     private void GetSpawnPose(out Vector3 position, out Quaternion rotation)
     {
-        position = transform.position + transform.forward * buildDistance;
-        position.y += groundOffset;
-        rotation = Quaternion.Euler(0f, 0f, 0f);
+        if (buildPoint != null)
+        {
+            position = buildPoint.position;
+            rotation = buildPoint.rotation;
+        }
+        else
+        {
+            position = transform.position + transform.forward * fallbackBuildDistance;
+            rotation = Quaternion.Euler(0f, 0f, 0f);
+        }
     }
 }
