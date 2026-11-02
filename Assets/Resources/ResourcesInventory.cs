@@ -6,14 +6,9 @@ using static UnityEngine.EventSystems.EventTrigger;
 
 public class ResourcesInventory : MonoBehaviour
 {
-    [Serializable]
-    public class ResourceEntry
-    {
-        public ResourcesType resourceType;
-        public int value;
-    }
-
     public List<ResourceEntry> inventory;
+
+    public event Action OnChanged;
 
     public bool AddResource(ResourcesType resourceType, int value)
     {
@@ -22,6 +17,7 @@ public class ResourcesInventory : MonoBehaviour
         if (resourceEntryToModify != null)
         {
             resourceEntryToModify.value += value;
+            OnChanged?.Invoke();
             return true;
         }
         else
@@ -29,5 +25,10 @@ public class ResourcesInventory : MonoBehaviour
             Debug.Log("Cannot pickup because resource type not found in inventory.");
             return false;
         }
+    }
+
+    public void NotifyChanged()
+    {
+        OnChanged?.Invoke();
     }
 }
