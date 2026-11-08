@@ -4,14 +4,9 @@ using UnityEngine;
 
 public class ResourcesInventory : MonoBehaviour
 {
-    [Serializable]
-    public class ResourceEntry
-    {
-        public ResourcesType resourceType;
-        public int value;
-    }
-
     public List<ResourceEntry> inventory = new List<ResourceEntry>();
+
+    public event Action OnChanged;
 
     public bool AddResource(ResourcesType resourceType, int value)
     {
@@ -24,6 +19,12 @@ public class ResourcesInventory : MonoBehaviour
         }
 
         entry.value += value;
+        OnChanged?.Invoke();
         return true;
+    }
+
+    public void NotifyChanged()
+    {
+        OnChanged?.Invoke();
     }
 }
