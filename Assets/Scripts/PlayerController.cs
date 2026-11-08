@@ -11,6 +11,8 @@ public class PlayerController : MonoBehaviour
     [Tooltip("Corrects the model facing if it points the wrong way, try 180 if it walks backwards.")]
     public float modelYawOffset = 0f;
 
+    [HideInInspector] public bool movementLocked;
+
     void Start()
     {
         controller = GetComponent<CharacterController>();
@@ -18,6 +20,8 @@ public class PlayerController : MonoBehaviour
 
     void Update()
     {
+        if (movementLocked) return;
+
         Vector3 direction = new Vector3(moveInput.x, 0f, moveInput.y);
         direction = Vector3.ClampMagnitude(direction, 1f);
 
