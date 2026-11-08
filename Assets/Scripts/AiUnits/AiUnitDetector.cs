@@ -9,9 +9,12 @@ public class AiUnitDetector : MonoBehaviour
 
     public List<AiUnit> UnitsInDetectionRange;
 
+    private AiUnit owner;
+
     private void Awake()
     {
         UnitsInDetectionRange = new List<AiUnit>();
+        owner = GetComponentInParent<AiUnit>();
     }
 
     private void OnDisable()
@@ -23,7 +26,7 @@ public class AiUnitDetector : MonoBehaviour
     {
         AiUnit unit = other.GetComponent<AiUnit>();
 
-        if (unit != null && !UnitsInDetectionRange.Contains(unit))
+        if (unit != null && IsEnemy(unit) && !UnitsInDetectionRange.Contains(unit))
         {
             UnitsInDetectionRange.Add(unit);
             OnUnitDetected?.Invoke(unit);
@@ -39,5 +42,10 @@ public class AiUnitDetector : MonoBehaviour
             UnitsInDetectionRange.Remove(unit);
             OnUnitLost?.Invoke(unit);
         }
+    }
+
+    private bool IsEnemy(AiUnit unit)
+    {
+        return owner == null || unit.Team != owner.Team;
     }
 }
