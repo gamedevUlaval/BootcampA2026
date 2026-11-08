@@ -1,8 +1,6 @@
-using Mono.Cecil;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
-using static UnityEngine.EventSystems.EventTrigger;
 
 public class ResourcesInventory : MonoBehaviour
 {
@@ -13,21 +11,19 @@ public class ResourcesInventory : MonoBehaviour
         public int value;
     }
 
-    public List<ResourceEntry> inventory;
+    public List<ResourceEntry> inventory = new List<ResourceEntry>();
 
     public bool AddResource(ResourcesType resourceType, int value)
     {
-        ResourceEntry resourceEntryToModify = inventory.Find(x => x.resourceType == resourceType);
+        ResourceEntry entry = inventory.Find(x => x.resourceType == resourceType);
 
-        if (resourceEntryToModify != null)
+        if (entry == null)
         {
-            resourceEntryToModify.value += value;
-            return true;
+            entry = new ResourceEntry { resourceType = resourceType };
+            inventory.Add(entry);
         }
-        else
-        {
-            Debug.Log("Cannot pickup because resource type not found in inventory.");
-            return false;
-        }
+
+        entry.value += value;
+        return true;
     }
 }
