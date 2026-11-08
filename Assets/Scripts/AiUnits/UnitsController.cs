@@ -28,7 +28,7 @@ public class UnitsController : MonoBehaviour
 
         folllowIndicators.Add(UnitType.Rock, rockFollowIndicator);
         folllowIndicators.Add(UnitType.Paper, paperFollowIndicator);
-        folllowIndicators.Add(UnitType.scissors, scissorsFollowIndicator);
+        folllowIndicators.Add(UnitType.Scissors, scissorsFollowIndicator);
 
         detector = GetComponentInChildren<AiUnitDetector>();
         detector.OnUnitDetected += OnUnitDetected;
@@ -64,7 +64,7 @@ public class UnitsController : MonoBehaviour
 
         if (Input.GetKeyDown(KeyCode.R))
         {
-            OnUnitTypeToggle(UnitType.scissors);
+            OnUnitTypeToggle(UnitType.Scissors);
         }
     }
 
