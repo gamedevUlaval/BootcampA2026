@@ -4,7 +4,6 @@ using UnityEngine;
 
 public class CombatState : State
 {
-    // change AiUnit for Hittable
     private AiUnit target;
     private float lastAttackTime;
     private float attackCooldown => 1 / unit.getAttackSpeed();
@@ -41,6 +40,12 @@ public class CombatState : State
 
     public override void UpdateState()
     {
+        if (target == null)
+        {
+            SelectNextTarget();
+            return;
+        }
+
         if (DistanceFromTarget() > unit.getAttackRange())
         {
             unit.Agent.destination = target.transform.position;
@@ -51,7 +56,7 @@ public class CombatState : State
 
             if (Time.time - lastAttackTime >= attackCooldown) 
             {
-                Debug.Log("Attack");
+                target.TakeDamage(unit.GetAttackDamageAgainst(target.UnitType));
                 lastAttackTime = Time.time;
             }
         }
@@ -64,16 +69,27 @@ public class CombatState : State
 
     private void OnTargetDeath()
     {
-        SetTarget(GetNextTarget());
+        SelectNextTarget();
+    }
+
+    private void SelectNextTarget()
+    {
+        AiUnit next = GetNextTarget();
+
+        if (next != null)
+            SetTarget(next);
+        else
+            unit.DefendPosition();
     }
 
     private AiUnit GetNextTarget()
     {
-        return AiUnitDetector.UnitsInDetectionRange.First();
+        return AiUnitDetector.UnitsInDetectionRange.FirstOrDefault(unit => unit != null && !unit.IsDead);
     }
+
     private void OnUnitLost(AiUnit lostUnit)
     {
         if(target == lostUnit)
-            SetTarget(GetNextTarget());
+            SelectNextTarget();
     }
 }

@@ -6,6 +6,7 @@ public class AiUnit : MonoBehaviour
 {
     [SerializeField] private AiUnitStats stats;
     [SerializeField] private UnitType type;
+    [SerializeField] private Team team;
 
     private State currentState;
     private FollowState followState;
@@ -13,13 +14,15 @@ public class AiUnit : MonoBehaviour
     private CombatState combatState;
     private State lastState;
 
-    //Change for a health detector
     private AiUnitDetector aiUnitDetector;
 
-    //temporary until health/damage system
     public Action OnDeath;
 
     public NavMeshAgent Agent;
+
+    public int CurrentHealth { get; private set; }
+    public int MaxHealth => stats.HealthPoints;
+    public bool IsDead { get; private set; }
 
     public State CurrentState
     {
@@ -30,11 +33,13 @@ public class AiUnit : MonoBehaviour
             currentState?.OnExit();
             lastState = currentState;
             currentState = value;
-            currentState.OnEnter();
+            currentState?.OnEnter();
         }
     }
 
     public UnitType UnitType => type;
+    public Team Team => team;
+    public AiUnitStats Stats => stats;
 
     private void Awake()
     {
@@ -48,6 +53,7 @@ public class AiUnit : MonoBehaviour
         Agent = GetComponent<NavMeshAgent>();
 
         Agent.speed = stats.MoveSpeed;
+        CurrentHealth = stats.HealthPoints;
     }
 
     private void Start()
@@ -63,7 +69,6 @@ public class AiUnit : MonoBehaviour
         currentState?.UpdateState();
     }
 
-    //temporary until health/damage system
     private void OnDestroy()
     {
         OnDeath?.Invoke();
@@ -77,12 +82,12 @@ public class AiUnit : MonoBehaviour
 
     public void DefendPosition()
     {
-        if (aiUnitDetector.UnitsInDetectionRange.Count == 0)
+        if (!HasLivingEnemies())
         {
             IdleState.SetPosition(transform.position);
             CurrentState = IdleState;
         }
-        else
+        else if (CurrentState != combatState)
         {
             EnterCombat(null);
         }
@@ -94,14 +99,48 @@ public class AiUnit : MonoBehaviour
         CurrentState = combatState;
     }
 
+    public bool HasLivingEnemies()
+    {
+        return aiUnitDetector.UnitsInDetectionRange.Exists(unit => unit != null && !unit.IsDead);
+    }
+
     public float getAttackRange() { return stats.AttackRange; }
     public float getAttackSpeed() { return stats.AttackSpeed; }
 
+    public int GetAttackDamageAgainst(UnitType defenderType)
+    {
+        float multiplier = 1f;
+
+        if (type.Beats(defenderType))
+            multiplier = stats.AdvantageMultiplier;
+        else if (defenderType.Beats(type))
+            multiplier = stats.DisadvantageMultiplier;
+
+        return Mathf.Max(1, Mathf.RoundToInt(stats.AttackDamage * multiplier));
+    }
+
+    public void TakeDamage(int amount)
+    {
+        if (IsDead)
+            return;
+
+        CurrentHealth = Mathf.Max(0, CurrentHealth - amount);
+
+        if (CurrentHealth == 0)
+        {
+            IsDead = true;
+            Destroy(gameObject);
+        }
+    }
+
     private void OnUnitLost(AiUnit unit)
     {
-        if (aiUnitDetector.UnitsInDetectionRange.Count == 0 && CurrentState == combatState)
+        if (!HasLivingEnemies() && CurrentState == combatState)
         {
-            CurrentState = lastState;
+            if (lastState != null)
+                CurrentState = lastState;
+            else
+                DefendPosition();
         }
     }
 
