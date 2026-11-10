@@ -70,7 +70,10 @@ public class BuilderPlayerComponent : MonoBehaviour
 
         GetSpawnPose(out Vector3 position, out Quaternion rotation);
         position.y += groundOffset;
-        Instantiate(blueprint.prefab, position, rotation);
+
+        GameObject instance = Instantiate(blueprint.prefab, position, rotation);
+        if (instance.TryGetComponent(out ResourceCollector collector))
+            collector.SetOwner(inventory);
 
         OnBuilt?.Invoke(blueprint);
         return true;

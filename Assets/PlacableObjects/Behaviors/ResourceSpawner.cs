@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 [RequireComponent(typeof(Placable))]
-public class RessourceSpawner : MonoBehaviour
+public class ResourceSpawner : MonoBehaviour
 {
     public ResourceScriptableObject resource;
 
@@ -16,7 +16,7 @@ public class RessourceSpawner : MonoBehaviour
     public float maxSpawnRadius = 2.0f;
     public int maxSpawnedResourcesCount = 10;
 
-    private readonly List<GameObject> spawnedResourcesList = new List<GameObject>();
+    public IReadOnlyList<GameObject> SpawnedResources => spawnedResourcesList;
 
     void Start()
     {
