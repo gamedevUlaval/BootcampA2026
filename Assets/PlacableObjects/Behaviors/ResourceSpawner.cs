@@ -16,6 +16,7 @@ public class ResourceSpawner : MonoBehaviour
     public float maxSpawnRadius = 2.0f;
     public int maxSpawnedResourcesCount = 10;
 
+    private readonly List<GameObject> spawnedResourcesList = new List<GameObject>();
     public IReadOnlyList<GameObject> SpawnedResources => spawnedResourcesList;
 
     void Start()
