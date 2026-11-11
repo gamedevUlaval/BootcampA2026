@@ -7,7 +7,7 @@ public class ResourceCollector : MonoBehaviour
     public float collectInterval = 2f;
 
     [Tooltip("Max resources collected per cycle.")]
-    public int resourcesPerCycle = 3;
+    public int resourcesPerCycle = 1;
 
     private ResourceSpawner spawner;
     private ResourcesInventory owner;
