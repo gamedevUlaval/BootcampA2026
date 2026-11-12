@@ -13,6 +13,7 @@ public class BuilderPlayerComponent : MonoBehaviour
     [SerializeField] private Transform buildPoint;
     [SerializeField] private float fallbackBuildDistance = 2f;
     [SerializeField] private float groundOffset = 0.5f;
+    [SerializeField] private float spawnerSearchRadius = 3f;
 
     public event Action<BuildableBlueprintScriptableObject> OnBuilt;
 
@@ -66,12 +67,27 @@ public class BuilderPlayerComponent : MonoBehaviour
         if (blueprint == null || blueprint.prefab == null) return false;
         if (!IsBuildable(blueprint)) return false;
 
+        ResourceSpawner target = null;
+        if (IsReplacementBlueprint(blueprint))
+        {
+            target = FindNearestFreeSpawner();
+            if (target == null) return false;
+        }
+
         ConsumeResources(blueprint);
 
-        GetSpawnPose(out Vector3 position, out Quaternion rotation);
-        position.y += groundOffset;
+        GameObject instance;
+        if (target != null)
+        {
+            instance = ReplaceSpawner(blueprint, target);
+        }
+        else
+        {
+            GetSpawnPose(out Vector3 position, out Quaternion rotation);
+            position.y += groundOffset;
+            instance = Instantiate(blueprint.prefab, position, rotation);
+        }
 
-        GameObject instance = Instantiate(blueprint.prefab, position, rotation);
         if (instance.TryGetComponent(out ResourceCollector collector))
             collector.SetOwner(inventory);
 
@@ -93,6 +109,9 @@ public class BuilderPlayerComponent : MonoBehaviour
 
             if (owned < cost.value) return false;
         }
+
+        if (IsReplacementBlueprint(blueprint) && FindNearestFreeSpawner() == null)
+            return false;
 
         return true;
     }
@@ -129,5 +148,49 @@ public class BuilderPlayerComponent : MonoBehaviour
             position = transform.position + transform.forward * fallbackBuildDistance;
             rotation = Quaternion.Euler(0f, 0f, 0f);
         }
+    }
+
+    private bool IsReplacementBlueprint(BuildableBlueprintScriptableObject blueprint)
+    {
+        return blueprint.prefab != null && blueprint.prefab.TryGetComponent<ResourceCollector>(out _);
+    }
+
+    private ResourceSpawner FindNearestFreeSpawner()
+    {
+        ResourceSpawner nearest = null;
+        float bestSqr = spawnerSearchRadius * spawnerSearchRadius;
+
+        foreach (ResourceSpawner spawner in FindObjectsByType<ResourceSpawner>(FindObjectsSortMode.None))
+        {
+            if (spawner.TryGetComponent<ResourceCollector>(out _)) continue;
+
+            float sqr = (spawner.transform.position - transform.position).sqrMagnitude;
+            if (sqr <= bestSqr)
+            {
+                bestSqr = sqr;
+                nearest = spawner;
+            }
+        }
+
+        return nearest;
+    }
+
+    private GameObject ReplaceSpawner(BuildableBlueprintScriptableObject blueprint, ResourceSpawner old)
+    {
+        Vector3 position = old.transform.position;
+        Quaternion rotation = old.transform.rotation;
+        ResourceScriptableObject resource = old.resource;
+
+        foreach (GameObject spawned in old.SpawnedResources)
+            if (spawned != null) Destroy(spawned);
+
+        Destroy(old.gameObject);
+
+        GameObject instance = Instantiate(blueprint.prefab, position, rotation);
+
+        if (resource != null && instance.TryGetComponent(out ResourceSpawner newSpawner))
+            newSpawner.resource = resource;
+
+        return instance;
     }
 }
