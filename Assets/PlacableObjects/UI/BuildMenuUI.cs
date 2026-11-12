@@ -161,7 +161,7 @@ public class BuildMenuUI : MonoBehaviour
     private string FormatLabel(BuildableBlueprintScriptableObject blueprint)
     {
         StringBuilder sb = new StringBuilder();
-        sb.Append("<b>").Append(blueprint.name).Append("</b>");
+        sb.Append("<b>").Append(blueprint.displayName).Append("</b>");
         sb.Append("\n<size=70%>");
 
         bool first = true;

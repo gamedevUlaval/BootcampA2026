@@ -158,4 +158,4 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ResourceCollector
   collectInterval: 2
-  resourcesPerCycle: 3
+  resourcesPerCycle: 1
