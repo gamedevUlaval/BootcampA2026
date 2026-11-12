@@ -47,6 +47,15 @@ public class ResourceSpawner : MonoBehaviour
         spawnedResourcesList.Add(spawned);
     }
 
+    public void AdoptResources(IEnumerable<GameObject> resources)
+    {
+        foreach (GameObject obj in resources)
+        {
+            if (obj != null && !spawnedResourcesList.Contains(obj))
+                spawnedResourcesList.Add(obj);
+        }
+    }
+
     void OnValidate()
     {
         minSpawnRadius = Mathf.Max(0f, minSpawnRadius);

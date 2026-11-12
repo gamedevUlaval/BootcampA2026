@@ -70,7 +70,7 @@ public class BuilderPlayerComponent : MonoBehaviour
         ResourceSpawner target = null;
         if (IsReplacementBlueprint(blueprint))
         {
-            target = FindNearestFreeSpawner();
+            target = FindNearestMatchingSpawner(blueprint);
             if (target == null) return false;
         }
 
@@ -110,7 +110,7 @@ public class BuilderPlayerComponent : MonoBehaviour
             if (owned < cost.value) return false;
         }
 
-        if (IsReplacementBlueprint(blueprint) && FindNearestFreeSpawner() == null)
+        if (IsReplacementBlueprint(blueprint) && FindNearestMatchingSpawner(blueprint) == null)
             return false;
 
         return true;
@@ -155,14 +155,26 @@ public class BuilderPlayerComponent : MonoBehaviour
         return blueprint.prefab != null && blueprint.prefab.TryGetComponent<ResourceCollector>(out _);
     }
 
-    private ResourceSpawner FindNearestFreeSpawner()
+    private ResourceScriptableObject GetBlueprintResource(BuildableBlueprintScriptableObject blueprint)
     {
+        if (blueprint.prefab != null && blueprint.prefab.TryGetComponent(out ResourceSpawner prefabSpawner))
+            return prefabSpawner.resource;
+
+        return null;
+    }
+
+    private ResourceSpawner FindNearestMatchingSpawner(BuildableBlueprintScriptableObject blueprint)
+    {
+        ResourceScriptableObject required = GetBlueprintResource(blueprint);
+        if (required == null) return null;
+
         ResourceSpawner nearest = null;
         float bestSqr = spawnerSearchRadius * spawnerSearchRadius;
 
         foreach (ResourceSpawner spawner in FindObjectsByType<ResourceSpawner>(FindObjectsSortMode.None))
         {
             if (spawner.TryGetComponent<ResourceCollector>(out _)) continue;
+            if (spawner.resource == null || spawner.resource.resourcesType != required.resourcesType) continue;
 
             float sqr = (spawner.transform.position - transform.position).sqrMagnitude;
             if (sqr <= bestSqr)
@@ -179,17 +191,15 @@ public class BuilderPlayerComponent : MonoBehaviour
     {
         Vector3 position = old.transform.position;
         Quaternion rotation = old.transform.rotation;
-        ResourceScriptableObject resource = old.resource;
 
-        foreach (GameObject spawned in old.SpawnedResources)
-            if (spawned != null) Destroy(spawned);
+        List<GameObject> existing = new List<GameObject>(old.SpawnedResources);
 
         Destroy(old.gameObject);
 
         GameObject instance = Instantiate(blueprint.prefab, position, rotation);
 
-        if (resource != null && instance.TryGetComponent(out ResourceSpawner newSpawner))
-            newSpawner.resource = resource;
+        if (instance.TryGetComponent(out ResourceSpawner newSpawner))
+            newSpawner.AdoptResources(existing);
 
         return instance;
     }
