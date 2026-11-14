@@ -21,7 +21,7 @@ public class Health : MonoBehaviour
 
             if (pointsBefore != currentPoints)
             {
-                OnPointsChanged?.Invoke(currentPoints);
+                OnPointsChanged?.Invoke();
 
                 if (IsDead)
                 {
@@ -35,8 +35,10 @@ public class Health : MonoBehaviour
     }
 
     public Action OnDeath;
-    public Action<float> OnPointsChanged;
+    public Action OnPointsChanged;
     public bool IsDead => currentPoints <= 0;
+
+    public float Ratio => CurrentHealthPoints / maxPoints;
 
     public void Initialize(float maxPoints, UnitType type)
     {

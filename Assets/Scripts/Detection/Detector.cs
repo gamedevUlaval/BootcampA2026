@@ -18,7 +18,7 @@ public class Detector<T> : MonoBehaviour
         DetectedList.Clear();
     }
 
-    protected void OnTriggerEnter(Collider other)
+    protected virtual void OnTriggerEnter(Collider other)
     {
         T detected = other.GetComponent<T>();
 
@@ -29,7 +29,7 @@ public class Detector<T> : MonoBehaviour
         }
     }
 
-    protected void OnTriggerExit(Collider other)
+    protected virtual void OnTriggerExit(Collider other)
     {
         T detected = other.GetComponent<T>();
 
@@ -38,5 +38,10 @@ public class Detector<T> : MonoBehaviour
             DetectedList.Remove(detected);
             OnLost?.Invoke(detected);
         }
+    }
+
+    public void Clean()
+    {
+        DetectedList.RemoveAll(x => x == null);
     }
 }

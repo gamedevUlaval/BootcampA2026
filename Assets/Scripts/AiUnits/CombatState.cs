@@ -90,4 +90,10 @@ public class CombatState : State
         if(currentTarget == lost)
             SelectNextTarget();
     }
+
+    private void OnDestroy()
+    {
+        if (currentTarget != null)
+            currentTarget.OnDeath -= OnTargetDeath;
+    }
 }

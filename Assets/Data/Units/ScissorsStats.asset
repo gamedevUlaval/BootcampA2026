@@ -16,4 +16,6 @@ MonoBehaviour:
   HealthPoints: 6
   AttackDamage: 1
   AttackRange: 2
-  AttackSpeed: 0.1
+  AttackSpeed: 1
+  AdvantageMultiplier: 2
+  DisadvantageMultiplier: 0.5

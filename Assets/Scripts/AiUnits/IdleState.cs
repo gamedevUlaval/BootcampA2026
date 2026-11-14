@@ -16,8 +16,5 @@ public class IdleState : State
 
     public override void OnExit(){}
 
-    public override void UpdateState()
-    {
-
-    }
+    public override void UpdateState(){}
 }
