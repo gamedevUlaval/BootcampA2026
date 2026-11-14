@@ -1,0 +1,1 @@
+public class AiUnitDetector : Detector<AiUnit>{}

@@ -81,6 +81,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4508528278209551489}
   - component: {fileID: 4380920945888523254}
+  - component: {fileID: 1390794137710522746}
   - component: {fileID: 1366631759676180819}
   - component: {fileID: 7140089732950569247}
   - component: {fileID: 2426000862281412621}
@@ -122,7 +123,22 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::AiUnit
   stats: {fileID: 0}
   type: 0
+  team: 0
+  Health: {fileID: 0}
   Agent: {fileID: 0}
+--- !u!114 &1390794137710522746
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7630474076791135440}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 230bc4e72373aa944a87eb8271f80641, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Health
+  destroyOnDeath: 1
 --- !u!195 &1366631759676180819
 NavMeshAgent:
   m_ObjectHideFlags: 0
@@ -204,10 +220,10 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 2624817257695019704}
-  - component: {fileID: 7465241231927422106}
+  - component: {fileID: 5724139432630208713}
   - component: {fileID: 4812564785052999439}
   m_Layer: 0
-  m_Name: AiUnitDetector
+  m_Name: TargetDetector
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -228,7 +244,7 @@ Transform:
   m_Children: []
   m_Father: {fileID: 4508528278209551489}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &7465241231927422106
+--- !u!114 &5724139432630208713
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -237,10 +253,10 @@ MonoBehaviour:
   m_GameObject: {fileID: 7832828867917336078}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a6a83f3d7ba641840a4b49760df6195b, type: 3}
+  m_Script: {fileID: 11500000, guid: 5151d84719085fb45a2c43596052d9c3, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::AiUnitDetector
-  UnitsInDetectionRange: []
+  m_EditorClassIdentifier: Assembly-CSharp::HealthDetector
+  DetectedList: []
 --- !u!135 &4812564785052999439
 SphereCollider:
   m_ObjectHideFlags: 0
