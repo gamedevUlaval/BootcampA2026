@@ -4,9 +4,8 @@ using UnityEngine;
 
 public class Health : MonoBehaviour
 {
+    [SerializeField] private float maxPoints;
     [SerializeField] private bool destroyOnDeath = true;
-
-    private float maxPoints;
     private float currentPoints;
 
     public UnitType Type = UnitType.None;
@@ -39,6 +38,11 @@ public class Health : MonoBehaviour
     public bool IsDead => currentPoints <= 0;
 
     public float Ratio => CurrentHealthPoints / maxPoints;
+
+    private void Awake()
+    {
+        currentPoints = maxPoints;
+    }
 
     public void Initialize(float maxPoints, UnitType type)
     {
