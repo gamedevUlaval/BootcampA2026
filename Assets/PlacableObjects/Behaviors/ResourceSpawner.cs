@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 [RequireComponent(typeof(Placable))]
-public class RessourceSpawner : MonoBehaviour
+public class ResourceSpawner : MonoBehaviour
 {
     public ResourceScriptableObject resource;
 
@@ -17,6 +17,7 @@ public class RessourceSpawner : MonoBehaviour
     public int maxSpawnedResourcesCount = 10;
 
     private readonly List<GameObject> spawnedResourcesList = new List<GameObject>();
+    public IReadOnlyList<GameObject> SpawnedResources => spawnedResourcesList;
 
     void Start()
     {
@@ -44,6 +45,15 @@ public class RessourceSpawner : MonoBehaviour
 
         GameObject spawned = Instantiate(resource.ressourcePrefab, spawnPosition, Quaternion.identity);
         spawnedResourcesList.Add(spawned);
+    }
+
+    public void AdoptResources(IEnumerable<GameObject> resources)
+    {
+        foreach (GameObject obj in resources)
+        {
+            if (obj != null && !spawnedResourcesList.Contains(obj))
+                spawnedResourcesList.Add(obj);
+        }
     }
 
     void OnValidate()
