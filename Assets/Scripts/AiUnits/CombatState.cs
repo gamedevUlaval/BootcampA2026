@@ -1,33 +1,31 @@
-using System;
 using System.Linq;
 using UnityEngine;
 
 public class CombatState : State
 {
-    private AiUnit target;
+    private Health currentTarget;
     private float lastAttackTime;
     private float attackCooldown => 1 / unit.getAttackSpeed();
 
-    //Change for a health detector
-    public AiUnitDetector AiUnitDetector;
+    public HealthDetector TargetDetector;
 
-    public void SetTarget(AiUnit newTarget) 
+    public void SetTarget(Health newTarget) 
     {
-        if(target != null)
-            target.OnDeath -= OnTargetDeath;
+        if(currentTarget != null)
+            currentTarget.OnDeath -= OnTargetDeath;
 
         if (newTarget != null)
             newTarget.OnDeath += OnTargetDeath;
 
-        target = newTarget;
+        currentTarget = newTarget;
     }
 
     public override void OnEnter()
     {
-        if(target == null)
+        if(currentTarget == null)
             SetTarget(GetNextTarget());
 
-        AiUnitDetector.OnUnitLost += OnUnitLost;
+        TargetDetector.OnLost += OnUnitLost;
     }
 
     public override void OnExit()
@@ -35,12 +33,12 @@ public class CombatState : State
         unit.Agent.ResetPath();
         SetTarget(null);
 
-        AiUnitDetector.OnUnitLost -= OnUnitLost;
+        TargetDetector.OnLost -= OnUnitLost;
     }
 
     public override void UpdateState()
     {
-        if (target == null)
+        if (currentTarget == null)
         {
             SelectNextTarget();
             return;
@@ -48,7 +46,7 @@ public class CombatState : State
 
         if (DistanceFromTarget() > unit.getAttackRange())
         {
-            unit.Agent.destination = target.transform.position;
+            unit.Agent.destination = currentTarget.transform.position;
         }
         else
         {
@@ -56,7 +54,7 @@ public class CombatState : State
 
             if (Time.time - lastAttackTime >= attackCooldown) 
             {
-                target.TakeDamage(unit.GetAttackDamageAgainst(target.UnitType));
+                currentTarget.CurrentHealthPoints -= unit.GetAttackDamageAgainst(currentTarget.Type);
                 lastAttackTime = Time.time;
             }
         }
@@ -64,7 +62,7 @@ public class CombatState : State
 
     private float DistanceFromTarget() 
     {
-        return Vector3.Distance(transform.position, target.transform.position);
+        return Vector3.Distance(transform.position, currentTarget.transform.position);
     }
 
     private void OnTargetDeath()
@@ -74,7 +72,7 @@ public class CombatState : State
 
     private void SelectNextTarget()
     {
-        AiUnit next = GetNextTarget();
+        Health next = GetNextTarget();
 
         if (next != null)
             SetTarget(next);
@@ -82,14 +80,20 @@ public class CombatState : State
             unit.DefendPosition();
     }
 
-    private AiUnit GetNextTarget()
+    private Health GetNextTarget()
     {
-        return AiUnitDetector.UnitsInDetectionRange.FirstOrDefault(unit => unit != null && !unit.IsDead);
+        return TargetDetector.DetectedList.FirstOrDefault(target => target != null && !target.IsDead);
     }
 
-    private void OnUnitLost(AiUnit lostUnit)
+    private void OnUnitLost(Health lost)
     {
-        if(target == lostUnit)
+        if(currentTarget == lost)
             SelectNextTarget();
+    }
+
+    private void OnDestroy()
+    {
+        if (currentTarget != null)
+            currentTarget.OnDeath -= OnTargetDeath;
     }
 }

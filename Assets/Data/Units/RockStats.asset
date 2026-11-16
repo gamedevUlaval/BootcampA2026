@@ -12,8 +12,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 606e7c411a126804ba8d2099e9ddbb99, type: 3}
   m_Name: RockStats
   m_EditorClassIdentifier: Assembly-CSharp::AiUnitStats
-  MoveSpeed: 1
+  MoveSpeed: 2
   HealthPoints: 10
   AttackDamage: 3
   AttackRange: 2
-  AttackSpeed: 0.1
+  AttackSpeed: 1
+  AdvantageMultiplier: 2
+  DisadvantageMultiplier: 0.5

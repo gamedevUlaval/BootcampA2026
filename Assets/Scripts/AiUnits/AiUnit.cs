@@ -14,15 +14,11 @@ public class AiUnit : MonoBehaviour
     private CombatState combatState;
     private State lastState;
 
-    private AiUnitDetector aiUnitDetector;
+    public Health Health;
 
-    public Action OnDeath;
+    private HealthDetector targetDetector;
 
     public NavMeshAgent Agent;
-
-    public int CurrentHealth { get; private set; }
-    public int MaxHealth => stats.HealthPoints;
-    public bool IsDead { get; private set; }
 
     public State CurrentState
     {
@@ -43,23 +39,25 @@ public class AiUnit : MonoBehaviour
 
     private void Awake()
     {
+        Health = GetComponent<Health>();
+
         followState = GetComponentInChildren<FollowState>();
         IdleState = GetComponentInChildren<IdleState>();
         combatState = GetComponentInChildren<CombatState>();
-        aiUnitDetector = GetComponentInChildren<AiUnitDetector>();
+        targetDetector = GetComponentInChildren<HealthDetector>();
 
-        combatState.AiUnitDetector = aiUnitDetector;
+        combatState.TargetDetector = targetDetector;
 
         Agent = GetComponent<NavMeshAgent>();
 
         Agent.speed = stats.MoveSpeed;
-        CurrentHealth = stats.HealthPoints;
+        Health.Initialize(stats.HealthPoints, type);
     }
 
     private void Start()
     {
-        aiUnitDetector.OnUnitLost += OnUnitLost;
-        aiUnitDetector.OnUnitDetected += OnUnitDetected;
+        targetDetector.OnLost += OnTargetLost;
+        targetDetector.OnDetected += OnTargetDetected;
 
         DefendPosition();
     }
@@ -67,11 +65,6 @@ public class AiUnit : MonoBehaviour
     private void Update()
     {
         currentState?.UpdateState();
-    }
-
-    private void OnDestroy()
-    {
-        OnDeath?.Invoke();
     }
 
     public void FollowTarget(Transform target)
@@ -82,7 +75,7 @@ public class AiUnit : MonoBehaviour
 
     public void DefendPosition()
     {
-        if (!HasLivingEnemies())
+        if (!HasTargetInRange())
         {
             IdleState.SetPosition(transform.position);
             CurrentState = IdleState;
@@ -93,15 +86,15 @@ public class AiUnit : MonoBehaviour
         }
     }
 
-    public void EnterCombat(AiUnit target)
+    public void EnterCombat(Health target)
     {
         combatState.SetTarget(target);
         CurrentState = combatState;
     }
 
-    public bool HasLivingEnemies()
+    public bool HasTargetInRange()
     {
-        return aiUnitDetector.UnitsInDetectionRange.Exists(unit => unit != null && !unit.IsDead);
+        return targetDetector.DetectedList.Exists(target => target != null && !target.IsDead);
     }
 
     public float getAttackRange() { return stats.AttackRange; }
@@ -119,23 +112,9 @@ public class AiUnit : MonoBehaviour
         return Mathf.Max(1, Mathf.RoundToInt(stats.AttackDamage * multiplier));
     }
 
-    public void TakeDamage(int amount)
+    private void OnTargetLost(Health target)
     {
-        if (IsDead)
-            return;
-
-        CurrentHealth = Mathf.Max(0, CurrentHealth - amount);
-
-        if (CurrentHealth == 0)
-        {
-            IsDead = true;
-            Destroy(gameObject);
-        }
-    }
-
-    private void OnUnitLost(AiUnit unit)
-    {
-        if (!HasLivingEnemies() && CurrentState == combatState)
+        if (!HasTargetInRange() && CurrentState == combatState)
         {
             if (lastState != null)
                 CurrentState = lastState;
@@ -144,11 +123,11 @@ public class AiUnit : MonoBehaviour
         }
     }
 
-    private void OnUnitDetected(AiUnit unit)
+    private void OnTargetDetected(Health target)
     {
         if (CurrentState == IdleState)
         {
-            EnterCombat(unit);
+            EnterCombat(target);
         }
     }
 }

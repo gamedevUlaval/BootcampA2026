@@ -31,7 +31,7 @@ public class UnitsController : MonoBehaviour
         folllowIndicators.Add(UnitType.Scissors, scissorsFollowIndicator);
 
         detector = GetComponentInChildren<AiUnitDetector>();
-        detector.OnUnitDetected += OnUnitDetected;
+        detector.OnDetected += OnUnitDetected;
     }
 
     private void OnUnitDetected(AiUnit unit)
@@ -70,7 +70,8 @@ public class UnitsController : MonoBehaviour
 
     private void OnUnitTypeToggle(UnitType type) 
     {
-        List<AiUnit> detectedUnits = detector.UnitsInDetectionRange.Where(x => x.UnitType == type).ToList();
+        detector.Clean();
+        List<AiUnit> detectedUnits = detector.DetectedList.Where(x => x != null && x.UnitType == type).ToList();
 
         if (detectedUnits.Count > 0 && !folllowToggles[type])
         {
@@ -84,6 +85,7 @@ public class UnitsController : MonoBehaviour
         }
         else
         {
+            followingUnits[type].RemoveAll(x => x == null);
             foreach (AiUnit unit in followingUnits[type])
             {
                 unit.DefendPosition();
