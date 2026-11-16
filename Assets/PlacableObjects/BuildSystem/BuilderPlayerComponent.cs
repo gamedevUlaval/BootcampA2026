@@ -150,17 +150,22 @@ public class BuilderPlayerComponent : MonoBehaviour
         }
     }
 
-    private bool IsReplacementBlueprint(BuildableBlueprintScriptableObject blueprint)
+    public bool IsReplacementBlueprint(BuildableBlueprintScriptableObject blueprint)
     {
         return blueprint.prefab != null && blueprint.prefab.TryGetComponent<ResourceCollector>(out _);
     }
 
-    private ResourceScriptableObject GetBlueprintResource(BuildableBlueprintScriptableObject blueprint)
+    public ResourceScriptableObject GetBlueprintResource(BuildableBlueprintScriptableObject blueprint)
     {
         if (blueprint.prefab != null && blueprint.prefab.TryGetComponent(out ResourceSpawner prefabSpawner))
             return prefabSpawner.resource;
 
         return null;
+    }
+
+    public bool HasMatchingSpawnerNearby(BuildableBlueprintScriptableObject blueprint)
+    {
+        return blueprint != null && FindNearestMatchingSpawner(blueprint) != null;
     }
 
     private ResourceSpawner FindNearestMatchingSpawner(BuildableBlueprintScriptableObject blueprint)

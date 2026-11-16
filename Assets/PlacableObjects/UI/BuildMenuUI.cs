@@ -172,6 +172,22 @@ public class BuildMenuUI : MonoBehaviour
             first = false;
         }
 
+        if (builder.IsReplacementBlueprint(blueprint))
+        {
+            ResourceScriptableObject spawnerResource = builder.GetBlueprintResource(blueprint);
+            if (spawnerResource != null)
+            {
+                if (!first) sb.Append("\n");
+
+                bool nearby = builder.HasMatchingSpawnerNearby(blueprint);
+                string hex = ColorUtility.ToHtmlStringRGB(nearby ? buildableColor : notBuildableColor);
+
+                sb.Append("<color=#").Append(hex).Append(">")
+                  .Append(spawnerResource.resourcesType).Append(" Spawner x1")
+                  .Append("</color>");
+            }
+        }
+
         sb.Append("</size>");
         return sb.ToString();
     }

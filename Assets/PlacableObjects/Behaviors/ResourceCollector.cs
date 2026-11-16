@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 [RequireComponent(typeof(ResourceSpawner))]
@@ -6,13 +7,24 @@ public class ResourceCollector : MonoBehaviour
     [Tooltip("Seconds between collection cycles.")]
     public float collectInterval = 2f;
 
-    [Tooltip("Max resources collected per cycle.")]
-    public int resourcesPerCycle = 1;
+    [Tooltip("Max resources that start moving toward the collector per cycle.")]
+    public int resourcesPerCycle = 3;
+
+    [Tooltip("Total resources this collector can ever collect. 0 = unlimited.")]
+    public int maxTotalCollected = 0;
+
+    [Header("Attraction")]
+    public float attractSpeed = 10f;
+    public float collectDistance = 1f;
+
+    private readonly List<ResourceComponent> incoming = new List<ResourceComponent>();
 
     private ResourceSpawner spawner;
     private ResourcesInventory owner;
     private float timer;
     private int totalCollected;
+
+    private bool CapReached => maxTotalCollected > 0 && totalCollected + incoming.Count >= maxTotalCollected;
 
     private void Awake()
     {
@@ -29,18 +41,21 @@ public class ResourceCollector : MonoBehaviour
         if (owner == null) return;
 
         timer += Time.deltaTime;
-        if (timer < collectInterval) return;
-        timer = 0f;
+        if (timer >= collectInterval)
+        {
+            timer = 0f;
+            StartCycle();
+        }
 
-        CollectCycle();
+        MoveIncoming();
     }
 
-    private void CollectCycle()
+    private void StartCycle()
     {
-        int collectedThisCycle = 0;
-        var spawned = spawner.SpawnedResources;
+        int started = 0;
+        IReadOnlyList<GameObject> spawned = spawner.SpawnedResources;
 
-        for (int i = 0; i < spawned.Count && collectedThisCycle < resourcesPerCycle; i++)
+        for (int i = 0; i < spawned.Count && started < resourcesPerCycle && !CapReached; i++)
         {
             GameObject obj = spawned[i];
             if (obj == null) continue;
@@ -48,11 +63,43 @@ public class ResourceCollector : MonoBehaviour
             if (!obj.TryGetComponent(out ResourceComponent resource) || resource.resourceScriptableObject == null)
                 continue;
 
-            owner.AddResource(resource.resourceScriptableObject.resourcesType, resource.resourceScriptableObject.value);
-            Destroy(obj);
+            if (incoming.Contains(resource)) continue;
 
-            collectedThisCycle++;
-            totalCollected++;
+            incoming.Add(resource);
+            started++;
         }
+    }
+
+    private void MoveIncoming()
+    {
+        for (int i = incoming.Count - 1; i >= 0; i--)
+        {
+            ResourceComponent resource = incoming[i];
+
+            if (resource == null)
+            {
+                incoming.RemoveAt(i);
+                continue;
+            }
+
+            resource.transform.position = Vector3.MoveTowards(
+                resource.transform.position, transform.position, attractSpeed * Time.deltaTime);
+
+            if (Vector3.Distance(resource.transform.position, transform.position) <= collectDistance)
+            {
+                Collect(resource);
+                incoming.RemoveAt(i);
+            }
+        }
+
+        if (maxTotalCollected > 0 && totalCollected >= maxTotalCollected && incoming.Count == 0)
+            enabled = false;
+    }
+
+    private void Collect(ResourceComponent resource)
+    {
+        owner.AddResource(resource.resourceScriptableObject.resourcesType, resource.resourceScriptableObject.value);
+        Destroy(resource.gameObject);
+        totalCollected++;
     }
 }
