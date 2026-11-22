@@ -161,7 +161,7 @@ public class BuildMenuUI : MonoBehaviour
     private string FormatLabel(BuildableBlueprintScriptableObject blueprint)
     {
         StringBuilder sb = new StringBuilder();
-        sb.Append("<b>").Append(blueprint.name).Append("</b>");
+        sb.Append("<b>").Append(blueprint.displayName).Append("</b>");
         sb.Append("\n<size=70%>");
 
         bool first = true;
@@ -170,6 +170,22 @@ public class BuildMenuUI : MonoBehaviour
             if (!first) sb.Append(", ");
             sb.Append(cost.resourceType).Append(" x").Append(cost.value);
             first = false;
+        }
+
+        if (builder.IsReplacementBlueprint(blueprint))
+        {
+            ResourceScriptableObject spawnerResource = builder.GetBlueprintResource(blueprint);
+            if (spawnerResource != null)
+            {
+                if (!first) sb.Append("\n");
+
+                bool nearby = builder.HasMatchingSpawnerNearby(blueprint);
+                string hex = ColorUtility.ToHtmlStringRGB(nearby ? buildableColor : notBuildableColor);
+
+                sb.Append("<color=#").Append(hex).Append(">")
+                  .Append(spawnerResource.resourcesType).Append(" Spawner x1")
+                  .Append("</color>");
+            }
         }
 
         sb.Append("</size>");
